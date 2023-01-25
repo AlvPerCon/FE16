@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+		<!--Account Move lines-->
+		<record id="agrupar_boletas_cpe_view" model="ir.ui.view">
+			<field name="name">Agrupar boletas en resumen</field>
+			<field name="model">solse.agrupar.resumen</field>
+			<field name="arch" type="xml">
+				<form string="Agrupar boletas en resumen">
+					<span class="o_form_label">Agrupar boletas ya creadas.</span>
+					<footer>
+						<button string="Agrupar boletas en resumen" name="crear_resumen_cpe" type="object" default_focus="1" class="btn-primary"/>
+						<button string="Cancel" class="btn-secondary" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="action_validate_account_move" model="ir.actions.act_window">
+			<field name="name">Agrupar boletas en resumen</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">solse.agrupar.resumen</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="agrupar_boletas_cpe_view"/>
+			<field name="context">{}</field>
+			<field name="target">new</field>
+			<field name="help">Agrupar boletas en resumen.</field>
+			<field name="binding_model_id" ref="solse_pe_cpe.model_solse_cpe" />
+			<field name="binding_view_types">list</field>
+		</record>
+
+	</data>
+</odoo>

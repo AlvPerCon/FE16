@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+<data>
+
+	<template id="solse_pe_pos_report.reporte_cierre_sesion">
+		<t t-if="not company">
+			<!-- Multicompany -->
+			<t t-if="company_id">
+				<t t-set="company" t-value="company_id"/>
+			</t>
+			<t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+				<t t-set="company" t-value="o.company_id.sudo()"/>
+			</t>
+			<t t-else="else">
+				<t t-set="company" t-value="res_company"/>
+			</t>
+		</t>
+		<div class="article o_report_layout_clean" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" style="font-family: Arial; font-size: 14px; margin: 0px; padding: 0px;">
+			<h4 style="text-align: center; width: 100%;">Reporte de Cierre de Caja</h4>
+			<table class="tabla" style="width: 100%;">
+				<tr>
+					<td style="width: 50%;">
+						<strong>Fecha y hora del reporte</strong>
+					</td>
+					<td style="width: 50%;text-align: right;">
+						<span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						<strong>ID Sesion</strong>
+					</td>
+					<td style="width: 50%;text-align: right;">
+						<span t-field="o.name" />
+					</td>
+				</tr>
+				<tr style="width: 100%;">
+					<td style="width: 30%;">
+						<strong>Estado</strong>
+					</td>
+					<td style="width: 70%;text-align: right;">
+						<span t-field="o.state" />
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						<strong>Inicio de Sesión</strong>
+					</td>
+					<td style="width: 50%;text-align: right;">
+						<span t-field="o.start_at" />
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						<strong>Cierre de Sesion</strong>
+					</td>
+					<td style="width: 50%;text-align: right;">
+						<span t-field="o.stop_at" />
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 30%;">
+						<strong>Punto de venta</strong>
+					</td>
+					<td style="width: 50%;text-align: right;">
+						<span t-field="o.config_id" />
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						<strong>Cajero</strong>
+					</td>
+					<td style="width: 50%;text-align: right;">
+						<span t-field="o.user_id" />
+					</td>
+				</tr>
+			</table>
+			<br/>
+			<div>
+				<strong>Resumen</strong>
+				<br/>
+				<div style="height: 1px; width: 100%; background: black;" />
+			</div>
+
+			<t t-set="total_ventas" t-value="0" />
+			<t t-set="total_ventas_efectivo" t-value="0" />
+
+			<table class="tabla" style="width: 100%;">
+				<tr>
+					<td style="width: 50%;">
+						<strong>Apertura de Caja</strong>
+					</td>
+					<td style="width: 25%;text-align: right;">
+						<strong><span t-esc="o.currency_id.symbol" /></strong>
+					</td>
+					<td style="width: 25%;text-align: right;">
+						<strong><span t-esc="'%.2f'% o.cash_register_balance_end_real" /></strong>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3" style="height: 6px;"></td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<strong >Ventas</strong>
+					</td>
+				</tr>
+				<t t-foreach="o.obtener_resumen_cierre()" t-as="pago">
+					<tr>
+						<td style="width: 45%;">
+							<span>
+								<span t-esc="pago['name']" />
+							</span>
+						</td>
+						<td style="width: 5%;text-align: right;">
+							<span t-esc="o.currency_id.symbol" />
+						</td>
+						<td style="width: 45%;text-align: right;">
+							<span t-esc="'%.2f'% pago['amount']" />
+						</td>
+					</tr>
+					<t t-set="total_ventas" t-value="total_ventas + pago['amount']" />
+					<t t-if="pago['type'] == 'efectivo'">
+						<t t-set="total_ventas_efectivo" t-value="total_ventas_efectivo + pago['amount']" />
+					</t>
+				</t>
+				<tr>
+					<td style="width: 45%;text-align: right;">
+						<strong>Total Ventas</strong>:
+					</td>
+					<td style="width: 5%;text-align: right;">
+						<strong><span t-esc="o.currency_id.symbol" /></strong>
+					</td>
+					<td style="width: 45%;text-align: right;">
+						<strong><span t-esc="'%.2f'% total_ventas"  /></strong>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3" style="height: 6px;"></td>
+				</tr>
+
+				<t t-set="total_devoluciones" t-value="0" />
+				<t t-set="total_devoluciones_efectivo" t-value="0" />
+				<tr>
+					<td colspan="3">
+						<strong >Devoluciones</strong>
+					</td>
+				</tr>
+				<t t-foreach="o.obtener_devoluciones_cierre()" t-as="devolucion">
+					<tr>
+						<td style="width: 45%;">
+							<span t-esc="devolucion['name']" />
+						</td>
+						<td style="width: 5%;text-align: right;">
+							<span t-esc="o.currency_id.symbol" />
+						</td>
+						<td style="width: 45%;text-align: right;">
+							<span t-esc="'%.2f'% devolucion['amount']" />
+						</td>
+					</tr>
+					<t t-set="total_devoluciones" t-value="total_devoluciones + devolucion['amount']" />
+					<t t-if="devolucion['monto_efectivo'] > 0" >
+						<t t-set="total_devoluciones_efectivo" t-value="total_devoluciones_efectivo + devolucion['monto_efectivo']" />
+					</t>
+				</t>
+				<tr>
+					<td style="width: 45%;text-align: right;">
+						<strong>Total Devol</strong>:
+					</td>
+					<td style="width: 5%;text-align: right;">
+						<strong><span t-esc="o.currency_id.symbol" /></strong>
+					</td>
+					<td style="width: 45%;text-align: right;">
+						<strong><span t-esc="'%.2f'% total_devoluciones" /></strong>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3" style="height: 6px;"></td>
+				</tr>
+
+				<t t-set="total_ingresos_salidas" t-value="0" />
+				<tr>
+					<td colspan="3">
+						<strong >Ingreso y Salida de Dinero</strong>
+					</td>
+				</tr>
+				<t t-foreach="o.obtener_ingresos_salidas()" t-as="registro">
+					<tr>
+						<td style="width: 50%;">
+							<span t-esc="registro['name']" />
+						</td>
+						<td style="width: 5%;text-align: right;">
+							<span t-esc="o.currency_id.symbol" />
+						</td>
+						<td style="width: 45%;text-align: right;">
+							<span t-esc="'%.2f'% registro['amount']" />
+						</td>
+					</tr>
+					<t t-set="total_ingresos_salidas" t-value="total_ingresos_salidas + registro['amount']" />
+				</t>
+				<tr>
+					<td style="width: 50%;text-align: right;">
+						<strong>Total Ing. y Sal.</strong>:
+					</td>
+					<td style="width: 5%;text-align: right;">
+						<strong><span t-esc="o.currency_id.symbol" /></strong>
+					</td>
+					<td style="width: 45%;text-align: right;">
+						<strong><span t-esc="'%.2f'% total_ingresos_salidas" /></strong>
+					</td>
+				</tr>
+			</table>
+
+			<div style="height: 1px; width: 100%; background: black;" />
+			
+			<t t-set="total_efectivo_cierre" t-value="o.cash_register_balance_end_real + total_ventas_efectivo + total_ingresos_salidas - total_devoluciones_efectivo" />
+			<t t-set="total_ingresos" t-value="total_ventas - (total_devoluciones * -1)" />
+			<table class="tabla" style="width: 100%;">
+				<tr>
+					<td style="width: 20.5%;"> </td>
+					<td style="width: 50%;">
+						<strong>Total de Efectivo</strong>
+					</td>
+					<td style="width: 5%;text-align: right;">
+						<strong><span t-esc="o.currency_id.symbol" /></strong>
+					</td>
+					<td style="width: 31%;text-align: right;">
+						<strong><span t-esc="'%.2f'% total_efectivo_cierre"/></strong>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 20.5%;"> </td>
+					<td style="width: 50%;">
+						<strong>Total  de  Ventas</strong>
+					</td>
+					<td style="width: 5%;text-align: right;">
+						<strong><span t-esc="o.currency_id.symbol" /></strong>
+					</td>
+					<td style="width: 31%;text-align: right;">
+						<strong><span t-esc="'%.2f'% total_ingresos"/></strong>
+					</td>
+				</tr>
+			</table>
+
+			<div style="height: 1px; width: 100%; background: black;" />
+
+			<!-- DETALLE -->
+			<t t-if="reporte_detallado">
+				<t t-set="total_detalle_venta" t-value="0" />
+				<div>
+					<span >Detalle Ventas</span>:	
+				</div>
+				<table class="tabla" style="width: 100%;">
+					<tr>
+						<th style="width: 25%;"> Tipo Comp</th>
+						<th style="width: 25%;"> Nro Comp.</th>
+						<th style="width: 25%;text-align: center;"> Tipo Pago</th>
+						<th style="width: 24%;text-align: right;"> Monto</th>
+					</tr>
+					<t t-foreach="o.order_ids" t-as="orden">
+						<t t-set="datos_orden" t-value="o.obtener_datos_pedido(orden.id)" />
+						<tr t-if="orden.amount_total > 0">
+							<td style="width: 25%;"> <t t-esc="datos_orden['tipo_comprobante']" /> </td>
+							<td style="width: 25%;">
+								<t t-esc="o.obtener_serie_correlativo(datos_orden['numero'])" />
+							</td>
+							<td style="width: 25%;text-align: center;"> <t t-esc="datos_orden['tipo_pago']"/> </td>
+							<td style="width: 24%;text-align: right;">
+								<span t-field="orden.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+							</td>
+
+							<t t-set="total_detalle_venta" t-value="total_detalle_venta + orden.amount_total" />
+						</tr>
+						
+					</t>
+					<tr>
+						<td  style="width: 20%;text-align: right;">
+							
+						</td>
+						<td colspan="2" style="width: 40%;text-align: right;">
+							<strong>Total Ventas</strong>:
+						</td>
+						<td style="width: 40%;text-align: right;">
+							<span t-esc="total_detalle_venta" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+						</td>
+					</tr>
+					
+				</table>
+				<t t-set="total_devoluciones_detalle" t-value="0" />
+				<div>
+					<span >Detalle Devoluciones</span>:
+				</div>
+				<table class="tabla" style="width: 100%;">
+					<tr>
+						<th style="width: 25%;"> Tipo Comp</th>
+						<th style="width: 25%;"> Nro Comp.</th>
+						<th style="width: 25%;text-align: center;"> Referenc.</th>
+						<th style="width: 24%;text-align: right;"> Monto</th>
+					</tr>
+					<t t-foreach="o.obtener_detalle_devoluciones()" t-as="devolucion">
+						<tr t-if="orden.amount_total > 0">
+							<td style="width: 25%;"> <t t-esc="devolucion['tipo_comprobante']" /> </td>
+							<td style="width: 25%;">
+								<t t-esc="o.obtener_serie_correlativo(devolucion['numero'])" />
+							</td>
+							<td style="width: 25%;text-align: center;"> <t t-esc="o.obtener_serie_correlativo(devolucion['referencia'])"/> </td>
+							<td style="width: 24%;text-align: right;">
+								<span t-esc="devolucion['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+							</td>
+							<t t-set="total_devoluciones_detalle" t-value="total_devoluciones_detalle + devolucion['amount']" />
+						</tr>
+						
+					</t>
+					<tr>
+						<td style="width: 20%;">
+							
+						</td>
+						<td colspan="2" style="width: 40%;text-align: right;">
+							<strong>Total Devoluciones</strong>:
+						</td>
+						<td style="width: 40%;text-align: right;">
+							<span t-esc="total_devoluciones_detalle" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+						</td>
+					</tr>
+				</table>
+				
+				<t t-set="total_ingresos_salidas_detalles" t-value="0" />
+				<div>
+					<span >Detalle Ingreso y Salida de Dinero</span>:
+				</div>
+				<table class="tabla" style="width: 100%;">
+					<t t-foreach="o.obtener_ingresos_salidas_detalle()" t-as="registro">
+						<tr>
+							<td style="width: 50%;"> 
+								<span t-esc="registro['name']" />
+							</td>
+							<td style="width: 50%;text-align: right;"> 
+								<span t-esc="registro['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+							</td>
+						</tr>
+					
+						<t t-set="total_ingresos_salidas_detalles" t-value="total_ingresos_salidas_detalles + registro['amount']" />
+					</t>
+					<tr>
+						<td style="width: 50%;text-align: right;"> 
+							<strong>Total Ing. y Sal.</strong>
+						</td>
+						<td style="width: 50%;text-align: right;"> 
+							<span t-esc="total_ingresos_salidas_detalles" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+						</td>
+					</tr>
+				</table>
+			</t>
+		</div>
+
+	</template>
+
+	<template id="report_cierre_sesion">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.user_id.sudo().lang"/>
+				<t t-call="solse_pe_pos_report.reporte_cierre_sesion" t-lang="lang"/>
+			</t>
+		</t>
+	</template>
+
+	<template id="report_cierre_detallado_sesion">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.user_id.sudo().lang"/>
+				<t t-set="reporte_detallado" t-value="True"/>
+				<t t-call="solse_pe_pos_report.reporte_cierre_sesion" t-lang="lang"/>
+			</t>
+		</t>
+	</template>
+
+	<record id="paperformat_ticket_cierre" model="report.paperformat">
+		<field name="name">Ticket</field>
+		<field name="default" eval="True" />
+		<field name="format">custom</field>
+		<field name="page_height">150</field>
+		<field name="page_width">80</field>
+		<field name="orientation">Portrait</field>
+		<field name="margin_top">1</field>
+		<field name="margin_bottom">1</field>
+		<field name="margin_left">1</field>
+		<field name="margin_right">1</field>
+		<field name="header_line" eval="False" />
+		<field name="dpi">90</field>
+	</record>
+
+	<record id="action_report_pos_cierre_sesion" model="ir.actions.report">
+		<field name="name">Cierre de sesión</field>
+		<field name="model">pos.session</field>
+		<field name="report_type">qweb-pdf</field>
+		<field name="report_name">solse_pe_pos_report.report_cierre_sesion</field>
+		<field name="report_file">solse_pe_pos_report.report_cierre_sesion</field>
+		<field name="binding_model_id" ref="point_of_sale.model_pos_session" />
+		<field name="binding_type">report</field>
+		<field name="paperformat_id" ref="solse_pe_pos_report.paperformat_ticket_cierre"/>
+	</record>
+
+	<record id="action_report_pos_cierre_detallado_sesion" model="ir.actions.report">
+		<field name="name">Cierre de sesión</field>
+		<field name="model">pos.session</field>
+		<field name="report_type">qweb-pdf</field>
+		<field name="report_name">solse_pe_pos_report.report_cierre_detallado_sesion</field>
+		<field name="report_file">solse_pe_pos_report.report_cierre_detallado_sesion</field>
+		<field name="binding_model_id" ref="point_of_sale.model_pos_session" />
+		<field name="binding_type">report</field>
+		<field name="paperformat_id" ref="solse_pe_pos_report.paperformat_ticket_cierre"/>
+	</record>
+</data>
+</odoo>

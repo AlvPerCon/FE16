@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="res_config_settings_view_form" model="ir.ui.view">
+		<field name="name">res.config.settings.view.form.inherit.solse_offline</field>
+        <field name="model">res.config.settings</field>
+		<field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+		<field name="arch" type="xml">
+
+			<xpath expr="//div[@id='pos_accounting_section']/div[4]//div[hasclass('content-group')]" position="inside">
+				<div class="row mt16">
+					<label string="Factura offline" for="factura_offline" class="col-lg-3 o_light_label"/>
+					<field name="factura_offline" colspan="4" nolabel="1" context="{'default_type': 'sale'}"  options="{'no_create': True}"/>
+				</div>
+				<div class="row mt16">
+					<label string="Boleta offline" for="boleta_offline" class="col-lg-3 o_light_label"/>
+					<field name="boleta_offline" colspan="4" nolabel="1" context="{'default_type': 'sale'}"  options="{'no_create': True}"/>
+				</div>
+				<div class="row mt16">
+					<label string="Otro offline" for="otro_offline" class="col-lg-3 o_light_label"/>
+					<field name="otro_offline" colspan="4" nolabel="1" context="{'default_type': 'sale'}"  options="{'no_create': True}"/>
+				</div>
+			</xpath>
+		</field>
+	</record>
+
+</odoo>

@@ -1,0 +1,81 @@
+
+.pos .popup .button{
+    float:right;
+    width: 110px;
+    height: 40px;
+    line-height:40px;
+    text-align:center;
+    border-radius: 2px;
+    margin-top:10px;
+    margin-right:10px;
+
+    font-size:   14px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    border: solid 1px rgba(60,60,60,0.1);
+
+    background: rgba(0,0,0,0.05);
+}
+
+@media screen and (max-width: 768px) {
+    .pos .popup .button{
+        float:right;
+        width: 110px;
+        height: 40px;
+        line-height:40px;
+        text-align:center;
+        border-radius: 2px;
+        margin-top:10px;
+        margin-right:10px;
+
+        font-size:   14px;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        border: solid 1px rgba(60,60,60,0.1);
+
+        background: rgba(0,0,0,0.05);
+    }
+    .pos .popup .footer {
+        /*height: 100px;*/
+        height: 70px;
+        background: #F0EEEE;
+        /*margin-top: -75px;*/
+    }
+
+    .pos .popup .footer2 {
+        height: 100px;
+        background: #F0EEEE;
+        margin-top: -75px;
+    }
+
+    .pos .popup .title {
+        background: rgba(255,255,255,0.5);
+        /*margin: 0;
+        line-height: 45px;*/
+        padding-top: 30px;
+        margin-top: 45px;
+        /*line-height: 20px;
+        height: 90px;*/
+        font-size: 15px;
+        border-radius: 3px 3px 0px 0px;
+        border-bottom: solid 1px rgba(60,60,60,0.1);
+    }
+
+    .cash-move .input-amount input {
+        width: 100%;
+        min-height: auto;
+        text-align: right;
+    }
+
+    .cash-move .input-amount .input-field span.currency {
+        float: right;
+        padding-top: -15px;
+        background: red;
+
+    }
+    
+}

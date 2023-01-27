@@ -1183,7 +1183,8 @@ class CPE:
 			elif price_unit_all == 0.0:
 				etree.SubElement(price, (tag.text), currencyID=(invoice_id.currency_id.name), nsmap={'cbc': tag.namespace}).text = str(round(price_unit_all, 6))
 			elif invoice_id.move_type in ['out_refund']:
-				etree.SubElement(price, (tag.text), currencyID=(invoice_id.currency_id.name), nsmap={'cbc': tag.namespace}).text = extension_amount
+				extension_amount_refund = str(round(float_round(line.get_price_unit_sunat()['total_excluded'], 6), 6))
+				etree.SubElement(price, (tag.text), currencyID=(invoice_id.currency_id.name), nsmap={'cbc': tag.namespace}).text = extension_amount_refund
 			else:
 				etree.SubElement(price, (tag.text), currencyID=(invoice_id.currency_id.name), nsmap={'cbc': tag.namespace}).text = str(round(float_round(line.get_price_unit_sunat()['total_excluded'], 6), 6))
 			

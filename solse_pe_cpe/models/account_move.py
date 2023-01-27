@@ -8,7 +8,8 @@ from pdf417gen.util import chunks
 from pdf417gen.compaction import compact_bytes
 from pdf417gen import render_image
 import tempfile
-from base64 import encodestring
+import base64
+#from base64 import encodestring
 import re
 from datetime import datetime, date, timedelta
 from odoo.tools.misc import formatLang
@@ -39,6 +40,15 @@ from functools import partial
 TYPE2JOURNAL = {'out_invoice':'sale', 
  'in_invoice':'purchase',  'out_refund':'sale', 
  'in_refund':'purchase'}
+
+def encodestring(datos):
+	respuesta = datos
+	if sys.version_info >= (3, 9):
+		respuesta = base64.encode(datos)
+	else:
+		respuesta = base64.encodestring(datos)
+
+	return respuesta
 
 class AccountPaymentRegister(models.TransientModel):
 	_inherit = 'account.payment.register'
@@ -477,6 +487,7 @@ class AccountMove(models.Model):
 			if rec.debit_origin_id:
 				document_types = document_types.filtered(lambda x: x.internal_type == 'debit_note')
 			l10n_latam_document_type_id = document_types and document_types[0]
+
 			if not l10n_latam_document_type_id:
 				rec.l10n_latam_document_type_id = False
 			else:

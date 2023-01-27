@@ -475,8 +475,6 @@ class CPE:
 	# Cuando existe descuento por operacines que son gratuitas de acuerdo a los impuestos, (Gratuitos)
 	# Descuento global
 	def _getAllowanceCharge(self, invoice_id):
-		_logging.info('pasa al descuentooo:::::::::::: ')
-		_logging.info(invoice_id.pe_total_discount)
 		if invoice_id.pe_total_discount > 0.0:
 			tag = etree.QName(self._cac, 'AllowanceCharge')
 			allowance_charge = etree.SubElement((self._root), (tag.text), nsmap={'cac': tag.namespace})
@@ -499,8 +497,6 @@ class CPE:
 		digits = decimal_precision_obj.precision_get('Product Price') or 2
 		for line in invoice_id.invoice_line_ids.filtered(lambda ln: ln.price_subtotal >= 0):
 			price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-			_logging.info('precion unitario asignado a la linea:::::::::::::::')
-			_logging.info(price_unit)
 			if invoice_id.pe_invoice_code == '08':
 				tag = etree.QName(self._cac, 'DebitNoteLine')
 			elif invoice_id.pe_invoice_code == '07':
@@ -593,7 +589,6 @@ class CPE:
 
 			digits_rounding_precision = invoice_id.currency_id.rounding
 			if line.tax_ids.filtered(lambda tax: tax.l10n_pe_edi_tax_code == '9996'):
-				_logging.info('la informacion para cuando tiene codigo 9996')
 				tax_total_values = line.tax_ids.with_context(round=False).filtered(lambda tax: tax.pe_tax_type.code != '9996').compute_all((line.price_unit), currency=(invoice_id.currency_id), quantity=(line.quantity), product=(line.product_id), partner=(invoice_id.partner_id))
 				etree.SubElement(total, (tag.text), currencyID=(invoice_id.currency_id.name), nsmap={'cbc': tag.namespace}).text = str(round(float_round((tax_total_values.get('total_included', 0.0) - tax_total_values.get('total_excluded', 0.0)), precision_rounding=digits_rounding_precision), 2))
 				tax_total_amount = 0.0
@@ -608,7 +603,6 @@ class CPE:
 				etree.SubElement(total, (tag.text), currencyID=(invoice_id.currency_id.name), nsmap={'cbc': tag.namespace}).text = str(round(float_round(tax_total_amount, precision_rounding=digits_rounding_precision), 2))
 			for tax in line.tax_ids.filtered(lambda tax: tax.pe_is_charge == False):
 				if tax.l10n_pe_edi_tax_code == '9996':
-					_logging.info('padando nuevamente por aqui 9996')
 					price_unit = line.price_unit
 					tag = etree.QName(self._cac, 'TaxSubtotal')
 					subtotal = etree.SubElement(total, (tag.text), nsmap={'cac': tag.namespace})

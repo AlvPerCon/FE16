@@ -8,7 +8,6 @@ from pdf417gen.util import chunks
 from pdf417gen.compaction import compact_bytes
 from pdf417gen import render_image
 import tempfile
-from base64 import encodestring
 import re
 from datetime import datetime, date, timedelta
 from odoo.tools.misc import formatLang

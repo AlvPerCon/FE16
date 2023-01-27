@@ -32,7 +32,7 @@ class AccountMoveReversal(models.TransientModel):
 		reverse_date = self.date if self.date_mode == 'custom' else move.date
 		l10n_latam_document_type_id = move.l10n_latam_document_type_id.nota_credito
 		reverse_date = self.date if self.date_mode == 'custom' else move.date
-		return {
+		datos_retorno = {
 			'ref': _('Reversal of: %(move_name)s, %(reason)s', move_name=move.name, reason=self.reason)
 				   if self.reason
 				   else _('Reversal of: %s', move.name),
@@ -45,6 +45,7 @@ class AccountMoveReversal(models.TransientModel):
 			'invoice_payment_term_id': None,
 			'invoice_user_id': move.invoice_user_id.id,
 			'auto_post': 'at_date' if reverse_date > fields.Date.context_today(self) else 'no',
+			'move_type': 'in_refund',
 		}
 
 		if move.move_type == 'in_invoice':

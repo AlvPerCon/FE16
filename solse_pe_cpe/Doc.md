@@ -39,3 +39,7 @@
 
 # 27/12/2022
 * Se agrega función para validación de envió, útil para otros módulos que dependen de este.
+
+# 06/12/2022
+* Se soluciona bug al emitir notas de credito con items con cantidades mayores a 1.
+* Se soluciona bug al instalar el modulo usando libreria de python >= 3.9 (libreria base64)
